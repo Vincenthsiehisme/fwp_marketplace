@@ -162,7 +162,7 @@ const ProductCheckout: React.FC<ProductCheckoutProps> = ({ record, product, onBa
                     好事連連：能量加乘加購
                 </h3>
                 
-                {/* ✅ 新增：訂單狀態指示器 */}
+                {/* ✅ 訂單狀態指示器 */}
                 {record.shippingDetails && (
                     <div className="flex items-center gap-2 px-3 py-1 bg-green-900/20 border border-green-500/30 rounded-full">
                         <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,26 +180,12 @@ const ProductCheckout: React.FC<ProductCheckoutProps> = ({ record, product, onBa
             </div>
 
             <div className="relative">
-                {/* ✅ 新增：禁用時的全局遮罩提示 */}
-                {record.shippingDetails && (
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-slate-950/80 via-slate-950/60 to-slate-950/80 backdrop-blur-[2px] rounded-3xl z-10 flex items-center justify-center pointer-events-none">
-                        <div className="bg-slate-900/90 border border-slate-700 rounded-2xl px-6 py-3 shadow-2xl">
-                            <p className="text-sm text-slate-300 flex items-center gap-2">
-                                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                訂單已確認，無法調整購買項目
-                            </p>
-                        </div>
-                    </div>
-                )}
-
                 {/* Scroll track with Snap logic */}
-                <div className={`flex overflow-x-auto pb-6 gap-5 snap-x snap-mandatory no-scrollbar -mx-4 px-4 scroll-smooth transition-all duration-300 ${record.shippingDetails ? 'opacity-50 grayscale' : ''}`}>
+                <div className="flex overflow-x-auto pb-6 gap-5 snap-x snap-mandatory no-scrollbar -mx-4 px-4 scroll-smooth">
                     {allProducts.map(p => {
                         const qty = cart[p.name] || 0;
                         const isMain = p.name === record.name;
-                        const isLocked = !!record.shippingDetails; // ✅ 鎖定狀態
+                        const isLocked = !!record.shippingDetails;
                         
                         return (
                             <div 
@@ -219,7 +205,7 @@ const ProductCheckout: React.FC<ProductCheckoutProps> = ({ record, product, onBa
                                         </div>
                                     )}
                                     
-                                    {/* ✅ 新增：鎖定圖示 */}
+                                    {/* ✅ 鎖定圖示 */}
                                     {isLocked && (
                                         <div className="absolute top-3 right-3 z-10">
                                             <div className="w-6 h-6 bg-slate-800/80 backdrop-blur-sm rounded-full flex items-center justify-center border border-slate-600">
@@ -235,7 +221,6 @@ const ProductCheckout: React.FC<ProductCheckoutProps> = ({ record, product, onBa
                                         alt={p.name} 
                                         className={`w-4/5 h-4/5 object-contain drop-shadow-lg transition-transform duration-700 ${qty > 0 && !isLocked ? 'scale-110' : isLocked ? '' : 'group-hover:scale-105 group-hover:brightness-110'}`} 
                                     />
-                                    {/* Light Overlay on Hover */}
                                     <div className={`absolute inset-0 bg-white/5 opacity-0 transition-opacity pointer-events-none ${!isLocked && 'group-hover:opacity-100'}`}></div>
                                 </div>
 
@@ -245,14 +230,14 @@ const ProductCheckout: React.FC<ProductCheckoutProps> = ({ record, product, onBa
                                     <p className="text-xs text-gold-400 font-sans mb-3">${p.price.toLocaleString()}</p>
                                     
                                     {/* Control Bar */}
-                                    <div className={`flex items-center gap-4 bg-slate-950/80 rounded-full px-3 py-1.5 border border-white/10 shadow-inner ${isLocked ? 'opacity-50' : ''}`}>
+                                    <div className="flex items-center gap-4 bg-slate-950/80 rounded-full px-3 py-1.5 border border-white/10 shadow-inner">
                                         <button 
                                             onClick={(e) => { 
-                                                if (isLocked) return; // ✅ 禁用邏輯
+                                                if (isLocked) return;
                                                 e.stopPropagation(); 
                                                 updateQuantity(p.name, -1); 
                                             }}
-                                            disabled={isLocked || qty <= (isMain ? 1 : 0)} // ✅ disabled 屬性
+                                            disabled={isLocked || qty <= (isMain ? 1 : 0)}
                                             className={`w-6 h-6 flex items-center justify-center rounded-full transition-colors ${
                                                 isLocked || qty <= (isMain ? 1 : 0) 
                                                     ? 'text-slate-800 cursor-not-allowed' 
@@ -268,11 +253,11 @@ const ProductCheckout: React.FC<ProductCheckoutProps> = ({ record, product, onBa
                                         
                                         <button 
                                             onClick={(e) => { 
-                                                if (isLocked) return; // ✅ 禁用邏輯
+                                                if (isLocked) return;
                                                 e.stopPropagation(); 
                                                 updateQuantity(p.name, 1); 
                                             }}
-                                            disabled={isLocked} // ✅ disabled 屬性
+                                            disabled={isLocked}
                                             className={`w-6 h-6 flex items-center justify-center rounded-full transition-colors ${
                                                 isLocked 
                                                     ? 'text-slate-800 cursor-not-allowed' 
