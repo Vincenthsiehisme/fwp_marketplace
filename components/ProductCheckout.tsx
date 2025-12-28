@@ -31,7 +31,6 @@ const ProductCheckout: React.FC<ProductCheckoutProps> = ({ record, product, onBa
 
   // Derive cart items for the pricing strategy
   const cartItems: CartItem[] = useMemo(() => {
-    // Explicitly cast Object.entries to avoid 'unknown' type inference on quantity in some TS environments
     return (Object.entries(cart) as [string, number][])
       .filter(([_, qty]) => qty > 0)
       .map(([name, qty]) => {
@@ -162,6 +161,17 @@ const ProductCheckout: React.FC<ProductCheckoutProps> = ({ record, product, onBa
                     <span className="w-2 h-2 rounded-full bg-gold-400 animate-pulse"></span>
                     好事連連：能量加乘加購
                 </h3>
+                
+                {/* ✅ 新增：訂單狀態指示器 */}
+                {record.shippingDetails && (
+                    <div className="flex items-center gap-2 px-3 py-1 bg-green-900/20 border border-green-500/30 rounded-full">
+                        <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <span className="text-xs text-green-400 font-bold">訂單已鎖定</span>
+                    </div>
+                )}
+                
                 <div className="flex gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-slate-700"></div>
                     <div className="w-1.5 h-1.5 rounded-full bg-gold-500/50"></div>
@@ -170,11 +180,26 @@ const ProductCheckout: React.FC<ProductCheckoutProps> = ({ record, product, onBa
             </div>
 
             <div className="relative">
+                {/* ✅ 新增：禁用時的全局遮罩提示 */}
+                {record.shippingDetails && (
+                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-slate-950/80 via-slate-950/60 to-slate-950/80 backdrop-blur-[2px] rounded-3xl z-10 flex items-center justify-center pointer-events-none">
+                        <div className="bg-slate-900/90 border border-slate-700 rounded-2xl px-6 py-3 shadow-2xl">
+                            <p className="text-sm text-slate-300 flex items-center gap-2">
+                                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                訂單已確認，無法調整購買項目
+                            </p>
+                        </div>
+                    </div>
+                )}
+
                 {/* Scroll track with Snap logic */}
-                <div className="flex overflow-x-auto pb-6 gap-5 snap-x snap-mandatory no-scrollbar -mx-4 px-4 scroll-smooth">
+                <div className={`flex overflow-x-auto pb-6 gap-5 snap-x snap-mandatory no-scrollbar -mx-4 px-4 scroll-smooth transition-all duration-300 ${record.shippingDetails ? 'opacity-50 grayscale' : ''}`}>
                     {allProducts.map(p => {
                         const qty = cart[p.name] || 0;
                         const isMain = p.name === record.name;
+                        const isLocked = !!record.shippingDetails; // ✅ 鎖定狀態
                         
                         return (
                             <div 
@@ -183,7 +208,7 @@ const ProductCheckout: React.FC<ProductCheckoutProps> = ({ record, product, onBa
                                     snap-center shrink-0 w-[200px] rounded-3xl border transition-all duration-500 flex flex-col group overflow-hidden
                                     ${qty > 0 ? 'bg-slate-800/80 border-gold-500/40 shadow-[0_10px_30px_rgba(245,158,11,0.15)]' : 'bg-slate-900/60 border-white/5'}
                                     ${isMain ? 'ring-2 ring-gold-500/30' : ''}
-                                    hover:bg-slate-800/90 hover:border-white/20
+                                    ${isLocked ? 'cursor-not-allowed' : 'hover:bg-slate-800/90 hover:border-white/20'}
                                 `}
                             >
                                 {/* Mini Product Thumbnail */}
@@ -193,13 +218,25 @@ const ProductCheckout: React.FC<ProductCheckoutProps> = ({ record, product, onBa
                                             <span className="bg-gold-500 text-slate-900 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter shadow-lg">主品項</span>
                                         </div>
                                     )}
+                                    
+                                    {/* ✅ 新增：鎖定圖示 */}
+                                    {isLocked && (
+                                        <div className="absolute top-3 right-3 z-10">
+                                            <div className="w-6 h-6 bg-slate-800/80 backdrop-blur-sm rounded-full flex items-center justify-center border border-slate-600">
+                                                <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    )}
+                                    
                                     <img 
                                         src={p.imageUrl} 
                                         alt={p.name} 
-                                        className={`w-4/5 h-4/5 object-contain drop-shadow-lg transition-transform duration-700 ${qty > 0 ? 'scale-110' : 'group-hover:scale-105 group-hover:brightness-110'}`} 
+                                        className={`w-4/5 h-4/5 object-contain drop-shadow-lg transition-transform duration-700 ${qty > 0 && !isLocked ? 'scale-110' : isLocked ? '' : 'group-hover:scale-105 group-hover:brightness-110'}`} 
                                     />
                                     {/* Light Overlay on Hover */}
-                                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                                    <div className={`absolute inset-0 bg-white/5 opacity-0 transition-opacity pointer-events-none ${!isLocked && 'group-hover:opacity-100'}`}></div>
                                 </div>
 
                                 {/* Content Info */}
@@ -208,20 +245,43 @@ const ProductCheckout: React.FC<ProductCheckoutProps> = ({ record, product, onBa
                                     <p className="text-xs text-gold-400 font-sans mb-3">${p.price.toLocaleString()}</p>
                                     
                                     {/* Control Bar */}
-                                    <div className="flex items-center gap-4 bg-slate-950/80 rounded-full px-3 py-1.5 border border-white/10 shadow-inner">
+                                    <div className={`flex items-center gap-4 bg-slate-950/80 rounded-full px-3 py-1.5 border border-white/10 shadow-inner ${isLocked ? 'opacity-50' : ''}`}>
                                         <button 
-                                            onClick={(e) => { e.stopPropagation(); updateQuantity(p.name, -1); }}
-                                            className={`w-6 h-6 flex items-center justify-center rounded-full transition-colors ${qty <= (isMain ? 1 : 0) ? 'text-slate-800' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
-                                            disabled={qty <= (isMain ? 1 : 0)}
+                                            onClick={(e) => { 
+                                                if (isLocked) return; // ✅ 禁用邏輯
+                                                e.stopPropagation(); 
+                                                updateQuantity(p.name, -1); 
+                                            }}
+                                            disabled={isLocked || qty <= (isMain ? 1 : 0)} // ✅ disabled 屬性
+                                            className={`w-6 h-6 flex items-center justify-center rounded-full transition-colors ${
+                                                isLocked || qty <= (isMain ? 1 : 0) 
+                                                    ? 'text-slate-800 cursor-not-allowed' 
+                                                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                                            }`}
                                         >
-                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20 12H4" /></svg>
+                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20 12H4" />
+                                            </svg>
                                         </button>
+                                        
                                         <span className="text-xs font-black text-white w-3">{qty}</span>
+                                        
                                         <button 
-                                            onClick={(e) => { e.stopPropagation(); updateQuantity(p.name, 1); }}
-                                            className="w-6 h-6 flex items-center justify-center rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                                            onClick={(e) => { 
+                                                if (isLocked) return; // ✅ 禁用邏輯
+                                                e.stopPropagation(); 
+                                                updateQuantity(p.name, 1); 
+                                            }}
+                                            disabled={isLocked} // ✅ disabled 屬性
+                                            className={`w-6 h-6 flex items-center justify-center rounded-full transition-colors ${
+                                                isLocked 
+                                                    ? 'text-slate-800 cursor-not-allowed' 
+                                                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                                            }`}
                                         >
-                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                                            </svg>
                                         </button>
                                     </div>
                                 </div>
@@ -231,9 +291,12 @@ const ProductCheckout: React.FC<ProductCheckoutProps> = ({ record, product, onBa
                     {/* Ghost card for padding */}
                     <div className="shrink-0 w-4"></div>
                 </div>
+                
                 {/* Horizontal Indicators for mobile hint */}
                 <div className="md:hidden text-center mt-2">
-                    <span className="text-[10px] text-slate-500 font-sans animate-pulse">左右滑動發現更多能量</span>
+                    <span className={`text-[10px] font-sans ${record.shippingDetails ? 'text-slate-600' : 'text-slate-500 animate-pulse'}`}>
+                        {record.shippingDetails ? '訂單項目已確認' : '左右滑動發現更多能量'}
+                    </span>
                 </div>
             </div>
         </div>
