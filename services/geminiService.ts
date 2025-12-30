@@ -181,7 +181,7 @@ export const analyzeCustomerProfile = async (profile: CustomerProfile): Promise<
   try {
     // Upgrade to gemini-3-pro-preview for complex reasoning task (BaZi analysis)
     const response = await ai.models.generateContent({
-      model: 'Gemini 2.5 Flash-Lite',
+      model: 'gemini-1.5-flash',
       contents: promptText,
       config: {
         responseMimeType: "application/json",
