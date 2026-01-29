@@ -573,8 +573,6 @@ const ShippingForm: React.FC<ShippingFormProps> = ({ onSubmit, isSubmitting = fa
             </div>
          </div>
       </div>
-         </div>  {/* 關閉 space-y-6 */}
-      </div>     {/* 關閉 bg-slate-900/60 rounded-xl... 的整個規格費用區塊 */}
       <div className="text-center mb-6">
         <h3 className="text-xl md:text-2xl font-bold font-sans text-white mb-2">填寫出貨資訊</h3>
       </div>
