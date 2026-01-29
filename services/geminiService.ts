@@ -1,8 +1,8 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { CustomerProfile, CrystalAnalysis } from '../types';
 import { CRYSTAL_KNOWLEDGE_BASE } from './crystalDatabase';
 import { getProductDetails } from './productDatabase';
+import { calculateBaziAccurate } from './baziCalculator';
 
 // Initialize Gemini Client
 // Always use const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
@@ -16,18 +16,19 @@ const STRATEGY_A_STRICT_BAZI = `
 【模式 A：精確八字排盤 (Time Known)】
 你必須採取「嚴格五行平衡」策略。
 
-1. **排盤與計算**：
-   - 嚴格計算年、月、日、時四柱。
-   - 精確計算身強身弱、通根透干、月令權重。
+1. **使用提供的排盤結果**：
+   - 系統已經精確計算好四柱與五行分數。
+   - **絕對不要重新計算**，直接使用提供的數據。
 
 2. **決定喜用神 (Lucky Element)**：
+   - 系統已經計算好喜用神。
    - 根據「扶抑（強者剋洩、弱者生扶）」、「調候（寒暖燥濕）」、「通關」原則。
    - **重要指令**：在此模式下，【忽略用戶的願望】。
    - 即使願望是求財，如果命盤「身弱不勝財」，喜用神必須是【印/比】（生扶），而不是【財】。
    - 喜用神必須是為了讓命盤達到「中和」狀態。
 
 3. **水晶選擇**：
-   - **嚴格限制**：選出的水晶必須在資料庫中對應到你的【喜用神】五行。
+   - **嚴格限制**：選出的水晶必須在資料庫中對應到系統計算的【喜用神】五行。
    - 例如：若喜用神為【木】，只能選 (木) 屬性水晶，不管用戶願望是什麼。
 
 4. **分析撰寫**：
@@ -39,9 +40,10 @@ const STRATEGY_B_WISH_ORIENTED = `
 由於用戶不確定出生時辰，四柱缺一，精確計算身強身弱容易失準。
 你必須採取「願望顯化」策略，並嚴格遵守願望分級：
 
-1. **排盤限制**：
-   - 僅排出年、月、日三柱供參考。時柱請標記為 "吉時" 或 "未知"。
+1. **使用提供的排盤結果**：
+   - 系統僅排出年、月、日三柱供參考。時柱已標記為 "吉時" 或 "未知"。
    - 五行分數計算僅基於前三柱（權重調整：月令仍最重）。
+   - **絕對不要重新計算**。
 
 2. **決定水晶 (Crystal Selection)**：
    - **最高準則**：你的設計與水晶選擇必須**100% 基於【主要願望 (Core Focus)】**。
@@ -53,7 +55,8 @@ const STRATEGY_B_WISH_ORIENTED = `
    - 例如：主要願望是「招財」，即使次要願望是「愛情」，也必須優先選擇 黃水晶、鈦晶、金髮晶。
 
 3. **反推喜用神 (Lucky Element)**：
-   - 將你為【主要願望】選出的水晶所屬的五行，設定為本次分析的【喜用神】。
+   - 系統已經根據願望計算好對應的五行作為喜用神。
+   - 直接使用系統提供的喜用神。
    
 4. **分析撰寫**：
    - 強調你是為了達成用戶的「主要願望」而凝聚能量。
@@ -126,6 +129,13 @@ const analysisSchema = {
  */
 export const analyzeCustomerProfile = async (profile: CustomerProfile): Promise<CrystalAnalysis> => {
   
+  // ✅ === 新增: 本地精確計算八字與五行 ===
+  const localBaziData = calculateBaziAccurate(
+    profile.birthDate,
+    profile.birthTime,
+    profile.isTimeUnsure || false
+  );
+  
   // Split wishes into Primary (Top 3) and Secondary (Rest)
   // The frontend guarantees the order based on user selection
   const primaryWishes = profile.wishes ? profile.wishes.slice(0, 3) : [];
@@ -153,29 +163,47 @@ export const analyzeCustomerProfile = async (profile: CustomerProfile): Promise<
     性別: ${profile.gender}
     (姓名: ${profile.name} - 僅供稱呼，**嚴禁**影響八字排盤)
     
-    【主要願望 (Core Focus) - 設計核心】: ${primaryWishesStr} (請以此為主進行設計)
+    【主要願望 (Core Focus) - 設計核心】: ${primaryWishesStr}
     【次要願望 (Auxiliary) - 僅供參考】: ${secondaryWishesStr}
     （系統規則：不得以次要願望作為選擇水晶的依據，只能在 Reasoning 中簡短提及背景。）
 
+    ✅ ===【系統已精確計算完成 - 你無需重新計算，直接使用以下數據】===
+    
+    四柱 (已排盤):
+      年柱: ${localBaziData.bazi.year}
+      月柱: ${localBaziData.bazi.month}
+      日柱: ${localBaziData.bazi.day}
+      時柱: ${localBaziData.bazi.time}
+    
+    五行分數 (已標準化至 0-100):
+      金 (Gold): ${localBaziData.fiveElements.gold}
+      木 (Wood): ${localBaziData.fiveElements.wood}
+      水 (Water): ${localBaziData.fiveElements.water}
+      火 (Fire): ${localBaziData.fiveElements.fire}
+      土 (Earth): ${localBaziData.fiveElements.earth}
+    
+    喜用神 (系統已計算): ${localBaziData.luckyElement}
+    日主: ${localBaziData.dayMaster} (${localBaziData.strength === 'strong' ? '身強' : '身弱'})
+
     ${strategyInstruction}
 
-    【通用八字排盤規則 (Step-by-Step)】
-    1. **年柱**：依據農曆立春分界。
-    2. **月柱**：**必須使用「五虎遁年起月法」**。務必精確對照「二十四節氣」判定月份。
-    3. **日柱**：請依據萬年曆推算干支。
-    4. **時柱**：若時間已知，使用「五鼠遁日起時法」；若未知，不計算干支。
+    【你的任務】
+    1. **嚴格依照系統提供的「喜用神: ${localBaziData.luckyElement}」**，從水晶資料庫選出 3 顆對應此五行的水晶
+    2. 撰寫分析文案 (reasoning)，解釋為何選擇這些水晶
+       - 如果是模式 A (時辰已知)：說明如何平衡五行
+       - 如果是模式 B (時辰未知)：說明如何達成主要願望
+    3. 生成視覺描述 (visualDescription) 與色票 (colorPalette)
     
-    【通用輸出規則】
-    - **五行分數**：無論哪種模式，請輸出當前命盤(3柱或4柱)的五行能量分佈 (0-100)。
-    - **分析一致性**：Reasoning 的內容必須解釋「為何選這個喜用神/水晶」。
-       - 模式 A 解釋：因為命盤缺 X，所以補 X。
-       - 模式 B 解釋：因為您的【主要願望】是 Y，此水晶能集中能量達成 Y。
-    - **嚴禁**在 Reasoning 中提及具體水晶名稱 (保留商業機密)。
+    【絕對禁止事項】
+    - ❌ 不要重新計算四柱
+    - ❌ 不要重新計算五行分數
+    - ❌ 不要改變喜用神
+    - ❌ suggestedCrystals 必須從資料庫中選擇，且必須對應 ${localBaziData.luckyElement} 屬性
 
     【水晶資料庫】(僅從此挑選):
     ${CRYSTAL_KNOWLEDGE_BASE}
 
-    請以繁體中文回應 JSON 格式。
+    請以繁體中文回應 JSON 格式。在 JSON 的 bazi、fiveElements、luckyElement 欄位，請直接複製系統提供的數值，不要修改。
   `;
 
   try {
@@ -195,6 +223,11 @@ export const analyzeCustomerProfile = async (profile: CustomerProfile): Promise<
     if (!text) throw new Error("No response from analysis model");
     
     const analysis = JSON.parse(text) as CrystalAnalysis;
+
+    // ✅ === 強制覆蓋 AI 回傳的數值欄位，確保 100% 使用本地計算結果 ===
+    analysis.bazi = localBaziData.bazi;
+    analysis.fiveElements = localBaziData.fiveElements;
+    analysis.luckyElement = localBaziData.luckyElement;
 
     // --- INTEGRATION: Product Database Override & Validation ---
     if (analysis.suggestedCrystals && analysis.suggestedCrystals.length > 0) {
