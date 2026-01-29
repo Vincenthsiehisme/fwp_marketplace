@@ -48,6 +48,24 @@ const ZHI_WUXING_MAP: Record<string, '金' | '木' | '水' | '火' | '土'> = {
 };
 
 /**
+ * 地支藏干對照表
+ */
+const ZHI_HIDE_GAN_MAP: Record<string, string[]> = {
+  '子': ['癸'],
+  '丑': ['己', '癸', '辛'],
+  '寅': ['甲', '丙', '戊'],
+  '卯': ['乙'],
+  '辰': ['戊', '乙', '癸'],
+  '巳': ['丙', '庚', '戊'],
+  '午': ['丁', '己'],
+  '未': ['己', '丁', '乙'],
+  '申': ['庚', '壬', '戊'],
+  '酉': ['辛'],
+  '戌': ['戊', '辛', '丁'],
+  '亥': ['壬', '甲'],
+};
+
+/**
  * 精確計算八字與五行
  */
 export const calculateBaziAccurate = (
@@ -67,12 +85,21 @@ export const calculateBaziAccurate = (
   const lunar = solar.getLunar();
   const baziChar = lunar.getEightChar();
 
-  // === 1. 排盤 ===
+  // === 1. 排盤 (使用正確的 API) ===
+  const yearGan = baziChar.getYearGan();
+  const yearZhi = baziChar.getYearZhi();
+  const monthGan = baziChar.getMonthGan();
+  const monthZhi = baziChar.getMonthZhi();
+  const dayGan = baziChar.getDayGan();
+  const dayZhi = baziChar.getDayZhi();
+  const timeGan = baziChar.getTimeGan();
+  const timeZhi = baziChar.getTimeZhi();
+
   const pillars = {
-    year: baziChar.getYearInGanZhi(),    // 如 "甲子"
-    month: baziChar.getMonthInGanZhi(),  
-    day: baziChar.getDayInGanZhi(),      
-    time: isTimeUnsure ? '吉時' : baziChar.getTimeInGanZhi(),
+    year: yearGan + yearZhi,
+    month: monthGan + monthZhi,
+    day: dayGan + dayZhi,
+    time: isTimeUnsure ? '吉時' : (timeGan + timeZhi),
   };
 
   // === 2. 精確計算五行分數 ===
@@ -80,15 +107,15 @@ export const calculateBaziAccurate = (
 
   // 取得四柱天干地支 (若時辰未知則只取三柱)
   const pillarArray = [
-    { gan: baziChar.getYearGan(), zhi: baziChar.getYearZhi(), isMonth: false },
-    { gan: baziChar.getMonthGan(), zhi: baziChar.getMonthZhi(), isMonth: true },
-    { gan: baziChar.getDayGan(), zhi: baziChar.getDayZhi(), isMonth: false },
+    { gan: yearGan, zhi: yearZhi, isMonth: false },
+    { gan: monthGan, zhi: monthZhi, isMonth: true },
+    { gan: dayGan, zhi: dayZhi, isMonth: false },
   ];
 
   if (!isTimeUnsure) {
     pillarArray.push({ 
-      gan: baziChar.getTimeGan(), 
-      zhi: baziChar.getTimeZhi(), 
+      gan: timeGan, 
+      zhi: timeZhi, 
       isMonth: false 
     });
   }
@@ -97,23 +124,22 @@ export const calculateBaziAccurate = (
     const monthWeight = pillar.isMonth ? 1.5 : 1; // 月令權重
     
     // 天干計分 (基礎 10 分)
-    const ganName = pillar.gan.getName();
+    const ganName = pillar.gan; // 直接是字串
     const ganElement = GAN_WUXING_MAP[ganName];
     if (ganElement) {
       scores[ganElement] += 10 * monthWeight;
     }
     
     // 地支計分 (基礎 15 分，主氣)
-    const zhiName = pillar.zhi.getName();
+    const zhiName = pillar.zhi; // 直接是字串
     const zhiElement = ZHI_WUXING_MAP[zhiName];
     if (zhiElement) {
       scores[zhiElement] += 15 * monthWeight;
     }
     
     // 藏干計分 (地支內含的天干，各 5 分)
-    const hideGans = pillar.zhi.getHideGan();
-    hideGans.forEach(hideGan => {
-      const hideName = hideGan.getName();
+    const hideGans = ZHI_HIDE_GAN_MAP[zhiName] || [];
+    hideGans.forEach(hideName => {
       const hideElement = GAN_WUXING_MAP[hideName];
       if (hideElement) {
         scores[hideElement] += 5 * monthWeight;
@@ -146,7 +172,7 @@ export const calculateBaziAccurate = (
   });
 
   // === 5. 判斷日主與身強身弱 (簡化版) ===
-  const dayMaster = baziChar.getDayGan().getName();
+  const dayMaster = dayGan; // 直接是字串
   const dayMasterElement = GAN_WUXING_MAP[dayMaster];
   
   // 計算生扶日主的五行總分
