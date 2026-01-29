@@ -394,10 +394,6 @@ const ShippingForm: React.FC<ShippingFormProps> = ({ onSubmit, isSubmitting = fa
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                 訂製規格與費用
             </h4>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-bold mt-2 ml-7 font-sans">
-               🗓️ 2026/2/2 起依序出貨
-            </div>
-         </div>
          <div className="space-y-6">
             <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700/50">
                <label className={`text-sm font-medium font-sans flex items-center gap-2 mb-3 ${errors.wristSize ? 'text-red-400' : 'text-white'}`}>
