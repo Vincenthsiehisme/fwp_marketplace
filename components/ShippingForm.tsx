@@ -716,13 +716,6 @@ const ShippingForm: React.FC<ShippingFormProps> = ({ onSubmit, isSubmitting = fa
             </div>
             <span className={`text-sm font-sans ${errors.agreement ? 'text-red-400' : agreed ? 'text-white' : 'text-slate-400'}`}>我已詳閱並同意購買須知</span>
          </label>
-         
-        <div className="mt-4 pt-2 border-t border-white/5">
-           <p className="text-[10px] text-slate-500 text-center font-sans">
-             * 提醒：本系列為預購產品，將於 2026/2/2 起發貨
-           </p>
-        </div>
-
         <button
           type="submit"
           disabled={isSubmitting}
