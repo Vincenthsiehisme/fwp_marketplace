@@ -573,6 +573,7 @@ const ShippingForm: React.FC<ShippingFormProps> = ({ onSubmit, isSubmitting = fa
             </div>
          </div>
       </div>
+        
       <div className="text-center mb-6">
         <h3 className="text-xl md:text-2xl font-bold font-sans text-white mb-2">填寫出貨資訊</h3>
       </div>
