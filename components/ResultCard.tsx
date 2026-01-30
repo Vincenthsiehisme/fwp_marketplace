@@ -35,7 +35,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ record, onReset, onShippingSubm
 
   const CUSTOM_STRATEGY: PricingStrategy = {
       type: 'custom',
-      basePrice: 2660,
+      basePrice: 2600,
       shippingCost: 60,
       sizeThreshold: 16,
       surcharge: 200
