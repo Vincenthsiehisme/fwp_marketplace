@@ -20,7 +20,7 @@ return (
 
     <div className="relative z-10 flex flex-col md:flex-row items-center justify-between p-6 py-10 md:p-12 gap-8 md:gap-12">
 
-      <div className="w-full md:w-3/5 space-y-6 text-center md:text-left relative z-20">
+      <div className="w-full space-y-6 text-center relative z-20">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300 text-[10px] md:text-xs font-bold tracking-[0.2em] font-sans mb-1 backdrop-blur-md">
           <span className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse"></span>
           NEW ARRIVAL 2026
