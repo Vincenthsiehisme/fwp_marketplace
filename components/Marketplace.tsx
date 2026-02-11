@@ -40,7 +40,7 @@ return (
           </p>
         </div>
 
-        <div className="pt-6 flex flex-col sm:flex-row gap-4 items-center justify-center md:justify-start">
+        <div className="pt-6 flex flex-col sm:flex-row gap-4 items-center justify-center">
 
           <button
             onClick={onOpenZodiac}
