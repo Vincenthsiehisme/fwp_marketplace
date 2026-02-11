@@ -1,5 +1,5 @@
-import React, { useMemo } from ‘react’;
-import { getProductList, ProductEntry } from ‘../services/productDatabase’;
+import React, { useMemo } from 'react';
+import { getProductList, ProductEntry } from '../services/productDatabase';
 
 interface MarketplaceProps {
 onProductSelect?: (product: ProductEntry & { name: string }) => void;
