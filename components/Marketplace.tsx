@@ -77,7 +77,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onProductSelect, onOpenZodiac
                 VISUAL FOCUS
                 - Adjusted margins: mt-4 md:mt-0 to pull it slightly closer on mobile but distinct.
             */}
-            <div className="hidden"
+            <div className="hidden
                  
                  {/* Core Glow (Intensified Gold) */}
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 md:w-56 md:h-56 bg-amber-500/30 rounded-full blur-[60px] md:blur-[80px] animate-pulse-slow"></div>
