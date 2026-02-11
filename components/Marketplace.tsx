@@ -12,7 +12,6 @@ const products = useMemo(() => getProductList(), []);
 return (
 <div className="w-full max-w-7xl mx-auto px-4 pb-32 animate-fade-in space-y-12">
 
-```
   <div className="relative mt-4 md:mt-8 rounded-[2.5rem] overflow-hidden border border-white/10 bg-slate-900/80 backdrop-blur-2xl shadow-2xl isolate group">
 
     <div className="absolute inset-0 bg-gradient-to-br from-slate-800/50 via-slate-900/80 to-slate-950 z-0"></div>
@@ -156,7 +155,6 @@ return (
     })}
   </div>
 </div>
-```
 
 );
 };
