@@ -33,7 +33,7 @@ return (
           </span>
         </h2>
 
-        <div className="md:border-l-2 md:border-white/10 md:pl-6 mx-auto md:mx-0 max-w-lg pt-2">
+        <div className="mx-auto max-w-lg pt-2">
           <p className="text-slate-300 text-base md:text-lg font-sans leading-relaxed font-light">
             以天然水晶凝聚天地能量，<br className="hidden md:block"/>
             為您的 2026 簽收一整年的小幸運。
