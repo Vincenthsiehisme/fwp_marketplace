@@ -5,9 +5,15 @@ import { CustomerProfile, Gender, WishItem } from '../types';
 interface CustomerFormProps {
   onSubmit: (profile: Omit<CustomerProfile, 'id' | 'createdAt'>) => void;
   isProcessing: boolean;
+  /**
+   * 由外部(tab)強制控制 isTimeUnsure 的值。
+   * 傳值時:鎖定為該值,並隱藏表單內「我不確定詳細時間」checkbox。
+   * 不傳:沿用原本的內部 checkbox 行為(向後相容)。
+   */
+  forceTimeUnsure?: boolean;
 }
 
-const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, isProcessing }) => {
+const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, isProcessing, forceTimeUnsure }) => {
   const [name, setName] = useState('');
   
   // Date State (Unified Native Date Picker)
@@ -21,7 +27,14 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, isProcessing }) =
   // Time State
   const [hour, setHour] = useState<string>('12');
   const [minute, setMinute] = useState<string>('00');
-  const [isTimeUnsure, setIsTimeUnsure] = useState(false);
+  const [isTimeUnsure, setIsTimeUnsure] = useState(forceTimeUnsure ?? false);
+
+  // 由外部(tab)強制覆蓋 isTimeUnsure
+  useEffect(() => {
+    if (typeof forceTimeUnsure === 'boolean') {
+      setIsTimeUnsure(forceTimeUnsure);
+    }
+  }, [forceTimeUnsure]);
   
   const [gender, setGender] = useState<Gender>(Gender.Female);
   
@@ -188,18 +201,20 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, isProcessing }) =
              <label className="block text-sm font-medium text-mystic-100 font-sans">
                 出生時間
              </label>
-             <label className="flex items-center gap-2 cursor-pointer group">
-                <input 
-                  type="checkbox" 
-                  checked={isTimeUnsure}
-                  onChange={(e) => setIsTimeUnsure(e.target.checked)}
-                  className="peer sr-only"
-                />
-                <div className="w-4 h-4 border border-slate-500 rounded bg-slate-900 peer-checked:bg-mystic-500 peer-checked:border-mystic-500 transition-colors"></div>
-                <span className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors select-none font-sans">
-                  我不確定詳細時間
-                </span>
-             </label>
+             {typeof forceTimeUnsure !== 'boolean' && (
+               <label className="flex items-center gap-2 cursor-pointer group">
+                  <input 
+                    type="checkbox" 
+                    checked={isTimeUnsure}
+                    onChange={(e) => setIsTimeUnsure(e.target.checked)}
+                    className="peer sr-only"
+                  />
+                  <div className="w-4 h-4 border border-slate-500 rounded bg-slate-900 peer-checked:bg-mystic-500 peer-checked:border-mystic-500 transition-colors"></div>
+                  <span className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors select-none font-sans">
+                    我不確定詳細時間
+                  </span>
+               </label>
+             )}
           </div>
           
           <div className={`transition-all duration-300 overflow-hidden ${isTimeUnsure ? 'opacity-50 grayscale pointer-events-none' : 'opacity-100'}`}>
