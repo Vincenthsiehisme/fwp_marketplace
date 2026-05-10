@@ -349,10 +349,10 @@ const App: React.FC = () => {
               <div className="absolute inset-2 border-2 border-slate-800 rounded-full"></div>
             </div>
             <h3 className="text-2xl md:text-3xl font-sans font-bold text-white animate-pulse tracking-wide text-center px-4">
-              {loadingMessage || '正在啟動能量分析...'}
+              {loadingMessage || '正在為您凝聚能量...'}
             </h3>
             <p className="text-mystic-400/70 mt-4 text-sm font-normal tracking-wider font-sans opacity-80">
-                凝聚天地能量，探尋命理奧秘
+                靜心片刻，讓宇宙為您指引方向
             </p>
           </div>
         )}
