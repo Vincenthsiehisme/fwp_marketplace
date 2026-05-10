@@ -112,9 +112,9 @@ const App: React.FC = () => {
   useEffect(() => {
     if (loadingState === 'analyzing') {
       const messages = [
-        "正在繪製八字命盤...",
-        "分析五行能量分佈...",
-        "推算喜用神與互補元素..."
+        "沉澱您的能量訊息...",
+        "感應能量流動...",
+        "為您配對相應的水晶..."
       ];
       let index = 0;
       setLoadingMessage(messages[0]);
