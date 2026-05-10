@@ -74,6 +74,15 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, isProcessing, for
     }
   }, [wishes]);
 
+  // Scroll/Highlight Wish section when Time Unsure is toggled
+  useEffect(() => {
+    if (isTimeUnsure && wishSectionRef.current) {
+      setTimeout(() => {
+        wishSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+    }
+  }, [isTimeUnsure]);
+
   // Focus Scroll Helper
   const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const target = e.target;
@@ -185,7 +194,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, isProcessing, for
           </div>
         </div>
 
-        {/* Birth Time */}
+        {/* Birth Time(僅在「五行手鍊」模式顯示;水晶能量手鍊模式不需出生時間) */}
+        {!forceTimeUnsure && (
         <div>
           <div className="flex justify-between items-center mb-2 ml-1">
              <label className="block text-sm font-medium text-mystic-100 font-sans">
@@ -247,6 +257,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, isProcessing, for
              </p>
           )}
         </div>
+        )}
 
         {/* Gender */}
         <div>
