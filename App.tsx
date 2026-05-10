@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { CustomerRecord, CustomerProfile, LoadingState, ShippingDetails } from './types';
 import CustomerForm from './components/CustomerForm';
@@ -111,24 +110,23 @@ const App: React.FC = () => {
 
   // Progressive Loading Text Logic
   useEffect(() => {
-  if (loadingState === 'analyzing') {  // ✅ 移除 || loadingState === 'generating_image'
-    const messages = [
-      "正在繪製八字命盤...",
-      "分析五行能量分佈...",
-      "推算喜用神與互補元素..."
-      // ❌ 刪除："正在凝聚專屬水晶能量..."
-    ];
-    let index = 0;
-    setLoadingMessage(messages[0]);
-    
-    const interval = setInterval(() => {
-      index = (index + 1) % messages.length;
-      setLoadingMessage(messages[index]);
-    }, 2500);
+    if (loadingState === 'analyzing') {
+      const messages = [
+        "正在繪製八字命盤...",
+        "分析五行能量分佈...",
+        "推算喜用神與互補元素..."
+      ];
+      let index = 0;
+      setLoadingMessage(messages[0]);
+      
+      const interval = setInterval(() => {
+        index = (index + 1) % messages.length;
+        setLoadingMessage(messages[index]);
+      }, 2500);
 
-    return () => clearInterval(interval);
-  }
-}, [loadingState]);
+      return () => clearInterval(interval);
+    }
+  }, [loadingState]);
 
   const handleTestConnection = async () => {
     const trimmedUrl = googleScriptUrl.trim();
@@ -151,47 +149,44 @@ const App: React.FC = () => {
     }
   };
 
-const handleFormSubmit = async (profileData: Omit<CustomerProfile, 'id' | 'createdAt'>) => {
-  setLoadingState('analyzing');
-  setErrorMessage(null);
+  const handleFormSubmit = async (profileData: Omit<CustomerProfile, 'id' | 'createdAt'>) => {
+    setLoadingState('analyzing');
+    setErrorMessage(null);
 
-  const newProfile: CustomerProfile = {
-    ...profileData,
-    id: crypto.randomUUID(),
-    createdAt: Date.now(),
-    wishes: profileData.wishes || []
-  };
-
-  try {
-    // 步驟 1: 分析八字
-    const analysis = await analyzeCustomerProfile(newProfile);
-    
-    // ❌ 移除：setLoadingState('generating_image');
-    // ❌ 移除：const imageUrl = await generateBraceletImage(analysis, newProfile);
-
-    // 步驟 2: 建立完整記錄（圖片欄位直接設為空字串）
-    const fullRecord: CustomerRecord = {
-      ...newProfile,
-      analysis,
-      generatedImageUrl: "", // ✅ 不再生成圖片
+    const newProfile: CustomerProfile = {
+      ...profileData,
+      id: crypto.randomUUID(),
+      createdAt: Date.now(),
+      wishes: profileData.wishes || []
     };
 
-    // 步驟 3: 儲存到資料庫
-    await dbService.addCustomer(fullRecord);
-    const updatedRecords = await dbService.getAllCustomers();
-    setCustomers(updatedRecords);
-    
-    // 步驟 4: 顯示結果
-    setCustomAnalysisRecord(fullRecord);
-    setLoadingState('completed');
-    setView('result');
+    try {
+      // 步驟 1: 分析八字
+      const analysis = await analyzeCustomerProfile(newProfile);
 
-  } catch (error: any) {
-    console.error(error);
-    setErrorMessage(error.message || "發生未知錯誤");
-    setLoadingState('error');
-  }
-};
+      // 步驟 2: 建立完整記錄（圖片欄位直接設為空字串）
+      const fullRecord: CustomerRecord = {
+        ...newProfile,
+        analysis,
+        generatedImageUrl: "", // 不再生成圖片
+      };
+
+      // 步驟 3: 儲存到資料庫
+      await dbService.addCustomer(fullRecord);
+      const updatedRecords = await dbService.getAllCustomers();
+      setCustomers(updatedRecords);
+      
+      // 步驟 4: 顯示結果
+      setCustomAnalysisRecord(fullRecord);
+      setLoadingState('completed');
+      setView('result');
+
+    } catch (error: any) {
+      console.error(error);
+      setErrorMessage(error.message || "發生未知錯誤");
+      setLoadingState('error');
+    }
+  };
 
   const handleCustomShippingSubmit = async (details: ShippingDetails) => {
     if (!customAnalysisRecord) return;
@@ -427,6 +422,8 @@ const handleFormSubmit = async (profileData: Omit<CustomerProfile, 'id' | 'creat
                 </div>
 
                 {/* Banner(依 tab 切換) */}
+                {customizeTab === 'bazi' ? (
+                  <div className="relative bg-slate-800/30 backdrop-blur-md p-6 rounded-2xl border border-mystic-500/20 overflow-hidden">
                     <div className="absolute top-0 right-0 -mr-12 -mt-12 w-48 h-48 bg-mystic-500/10 blur-[60px] rounded-full pointer-events-none"></div>
                     <div className="relative z-10 text-center space-y-3">
                       <h2 className="text-xl font-sans font-bold text-mystic-200 tracking-widest">
@@ -438,7 +435,7 @@ const handleFormSubmit = async (profileData: Omit<CustomerProfile, 'id' | 'creat
                     </div>
                   </div>
                 ) : (
-                  <div className="relative bg-slate-800/30 backdrop-blur-md p-6 rounded-2xl border border-gold-500/20 overflow-hidden animate-fade-in">
+                  <div className="relative bg-slate-800/30 backdrop-blur-md p-6 rounded-2xl border border-gold-500/20 overflow-hidden">
                     <div className="absolute top-0 right-0 -mr-12 -mt-12 w-48 h-48 bg-gold-500/10 blur-[60px] rounded-full pointer-events-none"></div>
                     <div className="relative z-10 text-center space-y-3">
                       <h2 className="text-xl font-sans font-bold text-gold-300 tracking-widest">
