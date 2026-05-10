@@ -255,7 +255,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, isProcessing, for
              <p className="text-[10px] text-yellow-500/80 mt-1.5 ml-1 font-sans border border-yellow-500/20 bg-yellow-900/10 p-2 rounded flex items-start gap-1">
                <span className="text-yellow-500 text-xs">⚡</span>
                <span>
-                 啟動<strong>願望顯化模式</strong>：系統將<span className="text-white underline">完全依據</span>您的主要願望進行設計，八字僅作輔助參考。
+                 啟動<strong>願望顯化模式</strong>：將<span className="text-white underline">完全依據</span>您的主要願望進行設計，八字僅作輔助參考。
                </span>
              </p>
           )}
