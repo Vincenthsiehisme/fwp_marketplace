@@ -38,6 +38,9 @@ const App: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [view, setView] = useState<'form' | 'result'>('form');
+
+  // Customize tab state: 'bazi' = 五行手鍊(知道時辰)、'wish' = 水晶能量手鍊(不知道時辰)
+  const [customizeTab, setCustomizeTab] = useState<'bazi' | 'wish'>('bazi');
   
   // Ref for auto-scrolling
   const resultRef = useRef<HTMLDivElement>(null);
@@ -389,22 +392,66 @@ const handleFormSubmit = async (profileData: Omit<CustomerProfile, 'id' | 'creat
            </>
         )}
 
-        {/* TAB 2: CUSTOMIZE (Original Logic) */}
+        {/* TAB 2: CUSTOMIZE (Tab + Banner + Form) */}
         {activeTab === 'customize' && (
-          <div className="flex flex-col items-center gap-8 min-h-[50vh]">
+          <div className="flex flex-col items-center gap-6 min-h-[50vh]">
             
-            {/* Intro Card */}
+            {/* Tab + Banner(只在 form 階段顯示) */}
             {view === 'form' && (
-              <div className="w-full max-w-lg mx-auto bg-slate-800/30 backdrop-blur-md p-6 rounded-2xl border border-white/5 animate-fade-in-up">
-                <div className="text-center space-y-4">
-                  <h2 className="text-xl font-sans font-bold text-mystic-200 tracking-widest">
-                    五行能量 • 靈性補足
-                  </h2>
-                  <p className="text-sm text-slate-300 leading-relaxed font-normal font-sans">
-                    透過 AI 八字推算，找出您命盤中缺乏的五行元素，<br/>
-                    量身打造專屬水晶手串。
-                  </p>
+              <div className="w-full max-w-lg mx-auto animate-fade-in-up">
+                {/* Tab 切換列 */}
+                <div className="relative flex bg-slate-800/40 backdrop-blur-xl rounded-2xl border border-white/5 p-1.5 mb-5">
+                  {[
+                    { key: 'bazi' as const, label: '五行手鍊', accent: 'mystic' as const },
+                    { key: 'wish' as const, label: '水晶能量手鍊', accent: 'gold' as const },
+                  ].map((tab) => {
+                    const isActive = customizeTab === tab.key;
+                    return (
+                      <button
+                        key={tab.key}
+                        type="button"
+                        onClick={() => setCustomizeTab(tab.key)}
+                        className={`relative flex-1 flex items-center justify-center gap-1.5 py-3 px-2 rounded-xl text-sm md:text-base font-bold font-sans transition-all duration-300 ${
+                          isActive
+                            ? tab.accent === 'mystic'
+                              ? 'bg-gradient-to-br from-mystic-700/60 to-mystic-900/40 text-white shadow-[0_0_20px_rgba(192,38,211,0.25)] border border-mystic-500/40'
+                              : 'bg-gradient-to-br from-gold-700/40 to-gold-900/30 text-white shadow-[0_0_20px_rgba(251,191,36,0.2)] border border-gold-500/40'
+                            : 'text-slate-400 hover:text-slate-200 border border-transparent'
+                        }`}
+                      >
+                        <span className={isActive ? '' : 'opacity-60'}>⭐</span>
+                        <span className="tracking-wide">{tab.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
+
+                {/* Banner(依 tab 切換) */}
+                {customizeTab === 'bazi' ? (
+                  <div className="relative bg-slate-800/30 backdrop-blur-md p-6 rounded-2xl border border-mystic-500/20 overflow-hidden animate-fade-in">
+                    <div className="absolute top-0 right-0 -mr-12 -mt-12 w-48 h-48 bg-mystic-500/10 blur-[60px] rounded-full pointer-events-none"></div>
+                    <div className="relative z-10 text-center space-y-3">
+                      <h2 className="text-xl font-sans font-bold text-mystic-200 tracking-widest">
+                        ⭐ 五行手鍊
+                      </h2>
+                      <p className="text-sm text-slate-300 leading-relaxed font-normal font-sans">
+                        我知道出生時間,依命盤搭配專屬水晶
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative bg-slate-800/30 backdrop-blur-md p-6 rounded-2xl border border-gold-500/20 overflow-hidden animate-fade-in">
+                    <div className="absolute top-0 right-0 -mr-12 -mt-12 w-48 h-48 bg-gold-500/10 blur-[60px] rounded-full pointer-events-none"></div>
+                    <div className="relative z-10 text-center space-y-3">
+                      <h2 className="text-xl font-sans font-bold text-gold-300 tracking-widest">
+                        ⭐ 水晶能量手鍊
+                      </h2>
+                      <p className="text-sm text-slate-300 leading-relaxed font-normal font-sans">
+                        我不知道出生時間,依需求客製水晶能量手鍊
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -412,6 +459,7 @@ const handleFormSubmit = async (profileData: Omit<CustomerProfile, 'id' | 'creat
                  <CustomerForm 
                    onSubmit={handleFormSubmit} 
                    isProcessing={loadingState !== 'idle' && loadingState !== 'error' && loadingState !== 'completed'} 
+                   forceTimeUnsure={customizeTab === 'wish'}
                  />
             ) : (
               customAnalysisRecord && (
