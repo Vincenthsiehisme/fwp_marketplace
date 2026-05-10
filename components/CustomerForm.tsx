@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { CustomerProfile, Gender, WishItem } from '../types';
 
@@ -74,15 +73,6 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, isProcessing, for
       setShowWishError(false);
     }
   }, [wishes]);
-
-  // Scroll/Highlight Wish section when Time Unsure is toggled
-  useEffect(() => {
-    if (isTimeUnsure && wishSectionRef.current) {
-      setTimeout(() => {
-        wishSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 300);
-    }
-  }, [isTimeUnsure]);
 
   // Focus Scroll Helper
   const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
