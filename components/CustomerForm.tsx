@@ -75,13 +75,16 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, isProcessing, for
   }, [wishes]);
 
   // Scroll/Highlight Wish section when Time Unsure is toggled
+  // 注意:當 isTimeUnsure 由外部 tab 控制(forceTimeUnsure 有值)時,跳過自動滾動
+  // 原因:使用者只是切 tab,不應觸發頁面跳到願望區
   useEffect(() => {
+    if (typeof forceTimeUnsure === 'boolean') return;
     if (isTimeUnsure && wishSectionRef.current) {
       setTimeout(() => {
         wishSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 300);
     }
-  }, [isTimeUnsure]);
+  }, [isTimeUnsure, forceTimeUnsure]);
 
   // Focus Scroll Helper
   const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
