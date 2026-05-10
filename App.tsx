@@ -427,8 +427,6 @@ const handleFormSubmit = async (profileData: Omit<CustomerProfile, 'id' | 'creat
                 </div>
 
                 {/* Banner(依 tab 切換) */}
-                {customizeTab === 'bazi' ? (
-                  <div className="relative bg-slate-800/30 backdrop-blur-md p-6 rounded-2xl border border-mystic-500/20 overflow-hidden animate-fade-in">
                     <div className="absolute top-0 right-0 -mr-12 -mt-12 w-48 h-48 bg-mystic-500/10 blur-[60px] rounded-full pointer-events-none"></div>
                     <div className="relative z-10 text-center space-y-3">
                       <h2 className="text-xl font-sans font-bold text-mystic-200 tracking-widest">
