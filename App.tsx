@@ -432,7 +432,7 @@ const handleFormSubmit = async (profileData: Omit<CustomerProfile, 'id' | 'creat
                     <div className="absolute top-0 right-0 -mr-12 -mt-12 w-48 h-48 bg-mystic-500/10 blur-[60px] rounded-full pointer-events-none"></div>
                     <div className="relative z-10 text-center space-y-3">
                       <h2 className="text-xl font-sans font-bold text-mystic-200 tracking-widest">
-                        ⭐ 五行手鍊
+                        五行手鍊
                       </h2>
                       <p className="text-sm text-slate-300 leading-relaxed font-normal font-sans">
                         我知道出生時間,依命盤搭配專屬水晶
@@ -444,7 +444,7 @@ const handleFormSubmit = async (profileData: Omit<CustomerProfile, 'id' | 'creat
                     <div className="absolute top-0 right-0 -mr-12 -mt-12 w-48 h-48 bg-gold-500/10 blur-[60px] rounded-full pointer-events-none"></div>
                     <div className="relative z-10 text-center space-y-3">
                       <h2 className="text-xl font-sans font-bold text-gold-300 tracking-widest">
-                        ⭐ 水晶能量手鍊
+                        水晶能量手鍊
                       </h2>
                       <p className="text-sm text-slate-300 leading-relaxed font-normal font-sans">
                         我不知道出生時間,依需求客製水晶能量手鍊
